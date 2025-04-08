@@ -5,7 +5,6 @@ const global = {
 //Function to display popular movies
 async function displayPopularMovies() {
   const { results } = await fetchAPIData('movie/popular');
-  console.log(results);
   results.forEach((movie) => {
     const div = document.createElement('div');
     div.classList.add('card');
@@ -38,6 +37,81 @@ async function displayPopularMovies() {
         `;
     document.querySelector('#popular-movies').appendChild(div);
   });
+}
+
+//Function to display movie details
+async function displayMovieDetails() {
+  const movieId = window.location.search.split('?')[1];
+  const movie = await fetchAPIData(`movie/${movieId}`);
+
+  //Overlay for background image
+  displayBackgroundImage('movie', movie.backdrop_path);
+
+  const div = document.createElement('div');
+  div.innerHTML = `
+  <div class="details-top">
+          <div>
+          ${
+            movie.poster_path
+              ? `
+            <img
+            src="https://image.tmdb.org/t/p/w500${movie.poster_path}"
+            class="card-img-top"
+            alt="${movie.title}"
+          />
+            `
+              : `
+            <img
+            src="images/no-image.jpg"
+            class="card-img-top"
+            alt="${movie.title}"
+          />
+            `
+          }
+          </div>
+          <div>
+            <h2>${movie.title}</h2>
+            <p>
+              <i class="fas fa-star text-primary"></i>
+              ${movie.vote_average.toFixed(1)}
+            </p>
+            <p class="text-muted">${movie.release_date}</p>
+            <p>
+              ${movie.overview}
+            </p>
+            <h5>Genres</h5>
+            <ul class="list-group">
+            ${movie.genres.map((genre) => `<li>${genre.name}</li>`).join('')}
+            </ul>
+            <a href="${
+              movie.homepage
+            }" target="_blank" class="btn">Visit Movie Homepage</a>
+          </div>
+        </div>
+        <div class="details-bottom">
+          <h2>Movie Info</h2>
+          <ul>
+            <li><span class="text-secondary">Budget:</span> $ ${addComasToNumber(
+              movie.budget
+            )}</li>
+            <li><span class="text-secondary">Revenue:</span> 
+            $ ${addComasToNumber(movie.revenue)}</li>
+            <li><span class="text-secondary">Runtime:</span> ${
+              movie.runtime
+            } minutes</li>
+            <li><span class="text-secondary">Status:</span> ${movie.status}</li>
+          </ul>
+          <h4>Production Companies</h4>
+          <div class="list-group">${movie.production_companies
+            .map(
+              (company) => `<span>
+            ${company.name}
+            </span>`
+            )
+            .join(', ')}</div>
+        </div>
+  `;
+  document.querySelector('#movie-details').appendChild(div);
 }
 
 //Function to display popular TV shows
@@ -77,6 +151,7 @@ async function displayPopularShows() {
     document.querySelector('#popular-shows').appendChild(div);
   });
 }
+
 //Function to display show details
 async function displayShowDdetails() {
   const series_id = window.location.search.split('?')[1];
@@ -152,80 +227,6 @@ async function displayShowDdetails() {
         </div>
   `;
   document.querySelector('#show-details').appendChild(div);
-}
-//Function to display movie details
-async function displayMovieDetails() {
-  const movieId = window.location.search.split('?')[1];
-  const movie = await fetchAPIData(`movie/${movieId}`);
-
-  //Overlay for background image
-  displayBackgroundImage('movie', movie.backdrop_path);
-
-  const div = document.createElement('div');
-  div.innerHTML = `
-  <div class="details-top">
-          <div>
-          ${
-            movie.poster_path
-              ? `
-            <img
-            src="https://image.tmdb.org/t/p/w500${movie.poster_path}"
-            class="card-img-top"
-            alt="${movie.title}"
-          />
-            `
-              : `
-            <img
-            src="images/no-image.jpg"
-            class="card-img-top"
-            alt="${movie.title}"
-          />
-            `
-          }
-          </div>
-          <div>
-            <h2>${movie.title}</h2>
-            <p>
-              <i class="fas fa-star text-primary"></i>
-              ${movie.vote_average.toFixed(1)}
-            </p>
-            <p class="text-muted">${movie.release_date}</p>
-            <p>
-              ${movie.overview}
-            </p>
-            <h5>Genres</h5>
-            <ul class="list-group">
-            ${movie.genres.map((genre) => `<li>${genre.name}</li>`).join('')}
-            </ul>
-            <a href="${
-              movie.homepage
-            }" target="_blank" class="btn">Visit Movie Homepage</a>
-          </div>
-        </div>
-        <div class="details-bottom">
-          <h2>Movie Info</h2>
-          <ul>
-            <li><span class="text-secondary">Budget:</span> $ ${addComasToNumber(
-              movie.budget
-            )}</li>
-            <li><span class="text-secondary">Revenue:</span> 
-            $ ${addComasToNumber(movie.revenue)}</li>
-            <li><span class="text-secondary">Runtime:</span> ${
-              movie.runtime
-            } minutes</li>
-            <li><span class="text-secondary">Status:</span> ${movie.status}</li>
-          </ul>
-          <h4>Production Companies</h4>
-          <div class="list-group">${movie.production_companies
-            .map(
-              (company) => `<span>
-            ${company.name}
-            </span>`
-            )
-            .join(', ')}</div>
-        </div>
-  `;
-  document.querySelector('#movie-details').appendChild(div);
 }
 
 //Display backdrop on details pages
